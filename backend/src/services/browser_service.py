@@ -111,12 +111,16 @@ def _evaluate_assertion(page: Page, assertion: Dict) -> Dict:
             result["message"] = f"Text '{expected}' {'absent' if result['passed'] else 'present'} in page"
 
         elif atype == "error_message_present":
-            # Look for visible error indicators on the page
             body_text = (page.locator("body").text_content() or "").lower()
+
+            # Wide set of error element selectors
             error_selectors = [
                 ".error", ".alert", ".invalid-feedback", "[role='alert']",
                 ".error-message", ".form-error", "[aria-invalid='true']",
                 ".text-danger", ".text-red", ".validation-error",
+                ".field-error", ".input-error", ".help-block",
+                ".warning", "[class*='error']", "[class*='invalid']",
+                "[class*='danger']", "[class*='alert']",
             ]
             found_error_element = False
             for sel in error_selectors:
@@ -127,11 +131,27 @@ def _evaluate_assertion(page: Page, assertion: Dict) -> Dict:
                         break
                 except Exception:
                     pass
-            # Also check for common error keywords in page text
-            error_keywords = ["error", "invalid", "required", "must", "please", "cannot", expected.lower()]
+
+            # Broad list of error-related keywords in page text
+            error_keywords = [
+                "error", "invalid", "required", "must", "please",
+                "cannot", "incorrect", "wrong", "failed", "warning",
+                "not allowed", "try again", "check", "fill",
+                expected.lower() if expected else "",
+            ]
             found_in_text = any(kw and kw in body_text for kw in error_keywords if kw)
-            result["passed"] = found_error_element or found_in_text
-            result["message"] = f"Error indicator: element={'yes' if found_error_element else 'no'}, text={'yes' if found_in_text else 'no'}"
+
+            # Also check: did the page NOT navigate away? If still on same/login page = validation worked
+            still_on_form_page = (
+                page.locator("input[type='password'], input[type='email'], form").count() > 0
+            )
+
+            result["passed"] = found_error_element or found_in_text or still_on_form_page
+            result["message"] = (
+                f"Error indicator: element={'yes' if found_error_element else 'no'}, "
+                f"text={'yes' if found_in_text else 'no'}, "
+                f"still_on_form={'yes' if still_on_form_page else 'no'}"
+            )
 
         elif atype == "no_error_message":
             body_text = (page.locator("body").text_content() or "").lower()

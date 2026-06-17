@@ -1,10 +1,5 @@
 fastapi
 uvicorn
 playwright
-mysql-connector-python
-sqlalchemy
 pydantic-settings
-qdrant-client
-networkx
-sentence-transformers
 beautifulsoup4

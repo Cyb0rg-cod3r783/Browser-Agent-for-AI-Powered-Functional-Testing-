@@ -3,20 +3,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .api import workflows
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup (DB and Qdrant disabled for temporary JSON-only storage mode)
-    # create_all_tables()
-    # try:
-    #     vector_db_client.create_collections()
-    # except Exception as e:
-    #     print(f"Warning: Could not connect to Qdrant vector DB: {e}. Continuing without it.")
+    # All data is stored in workflows_db.json — no DB setup needed
     yield
-    # Shutdown (nothing to do for now)
 
-app = FastAPI(lifespan=lifespan)
 
-# Set up CORS middleware to allow requests from our frontend and browser extensions
+app = FastAPI(
+    title="WorkflowBot API",
+    description="Browser workflow recorder and AI-powered test automation",
+    version="2.0.0",
+    lifespan=lifespan,
+)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -28,6 +28,7 @@ app.add_middleware(
 
 app.include_router(workflows.router, prefix="/api/v1", tags=["Workflows"])
 
+
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"status": "ok", "storage": "json", "data_file": "workflows_db.json"}

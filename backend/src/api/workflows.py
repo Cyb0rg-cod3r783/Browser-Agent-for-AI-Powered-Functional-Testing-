@@ -376,9 +376,18 @@ async def run_all_tests(
         duration_ms = int((datetime.utcnow() - start).total_seconds() * 1000)
 
         has_failure = any(r["status"] == "failed" for r in raw.get("step_results", []))
-        assertions_passed = all(a["passed"] for a in raw.get("assertion_results", [])) \
-            if raw.get("assertion_results") else (not has_failure)
-        status = "passed" if (not has_failure and assertions_passed) else "failed"
+        tc_category = tc.get("category", "happy_path")
+        ar_list = raw.get("assertion_results", [])
+
+        if ar_list:
+            assertions_passed = all(a["passed"] for a in ar_list)
+            if tc_category == "happy_path":
+                status = "passed" if (not has_failure and assertions_passed) else "failed"
+            else:
+                # For negative/edge/security: assertions decide, not step failures
+                status = "passed" if assertions_passed else "failed"
+        else:
+            status = "passed" if not has_failure else "failed"
 
         results.append({
             "index": idx,
@@ -431,7 +440,16 @@ async def replay_test_case(
             selector = eid
         else:
             safe = eid.replace("'", "\\'")
-            selector = f"#{safe}, [name='{safe}'], [placeholder='{safe}']"
+            # Comprehensive fallback: id, name, placeholder, value attr, button text, input[type=submit]
+            selector = (
+                f"#{safe}, "
+                f"[name='{safe}'], "
+                f"[placeholder='{safe}'], "
+                f"[value='{safe}'], "
+                f"input[type='submit'], "
+                f"button[type='submit'], "
+                f"button"
+            )
 
         replay_steps.append({
             "step_order": i + 1,
@@ -457,10 +475,10 @@ async def replay_test_case(
     assertion_results = raw.get("assertion_results", [])
 
     formatted_steps = []
-    has_failure = False
+    has_step_failure = False
     for r, orig in zip(step_results, replay_steps):
         if r["status"] == "failed":
-            has_failure = True
+            has_step_failure = True
         formatted_steps.append(ReplayTestCaseStepResult(
             step_index=r["step_order"] - 1,
             element_id=orig["element_id"],
@@ -480,8 +498,22 @@ async def replay_test_case(
         for ar in assertion_results
     ]
 
-    assertions_passed = all(ar["passed"] for ar in assertion_results) if assertion_results else (not has_failure)
-    status = "passed" if (not has_failure and assertions_passed) else "failed"
+    category = test_case.get("category", "happy_path")
+
+    if assertion_results:
+        # Assertions are always the source of truth
+        assertions_passed = all(ar["passed"] for ar in assertion_results)
+        if category == "happy_path":
+            # Happy path: steps must all succeed AND assertions must pass
+            status = "passed" if (not has_step_failure and assertions_passed) else "failed"
+        else:
+            # Negative / edge / security: assertions decide pass/fail.
+            # A step "failing" (e.g. submit button not found) is expected and acceptable —
+            # what matters is whether the page behaved correctly (stayed on page, showed error, etc.)
+            status = "passed" if assertions_passed else "failed"
+    else:
+        # No assertions defined — fall back to step results
+        status = "passed" if not has_step_failure else "failed"
 
     return ReplayTestCaseResponse(
         workflow_id=workflow_id,

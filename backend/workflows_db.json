@@ -355,6 +355,198 @@
           "confidence": 0.83
         }
       ]
+    },
+    {
+      "id": 4,
+      "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609]",
+      "url": "https://test2.squad1.tech/login",
+      "created_at": "2026-06-17T12:06:09.016570",
+      "test_cases": [
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609] \u2014 Happy Path",
+          "category": "happy_path",
+          "description": "Reproduce the recorded flow with valid data",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "click",
+              "value": null
+            },
+            {
+              "element_id": "a#loginBtn",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_error_message",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "error"
+            }
+          ],
+          "confidence": 0.88
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609] \u2014 All Fields Empty",
+          "category": "negative",
+          "description": "Submit without filling any fields; expect validation errors",
+          "steps": [
+            {
+              "element_id": "submit",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "error_message_present",
+              "expected": "required"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.9
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609] \u2014 SQL Injection",
+          "category": "security",
+          "description": "Inject SQL into every text field",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "click",
+              "value": null
+            },
+            {
+              "element_id": "a#loginBtn",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            },
+            {
+              "type": "no_sql_error",
+              "expected": "syntax error"
+            },
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.92
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609] \u2014 XSS Payload",
+          "category": "security",
+          "description": "Inject script tags into every text field",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "click",
+              "value": null
+            },
+            {
+              "element_id": "a#loginBtn",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.9
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609] \u2014 Max Length Boundary",
+          "category": "edge_case",
+          "description": "Fill every field with 300+ character string",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "click",
+              "value": null
+            },
+            {
+              "element_id": "a#loginBtn",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609] \u2014 Unicode Characters",
+          "category": "edge_case",
+          "description": "Fill fields with unicode, emoji, and RTL text",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "click",
+              "value": null
+            },
+            {
+              "element_id": "a#loginBtn",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.83
+        }
+      ]
     }
   ],
   "workflow_steps": [
@@ -617,12 +809,77 @@
       "value": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx",
       "selector": null,
       "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
+    },
+    {
+      "id": 27,
+      "workflow_id": 4,
+      "element_id": null,
+      "step_order": 1,
+      "action": "navigate",
+      "value": "https://test2.squad1.tech/login",
+      "selector": null,
+      "url": "https://test2.squad1.tech/login"
+    },
+    {
+      "id": 28,
+      "workflow_id": 4,
+      "element_id": 42,
+      "step_order": 2,
+      "action": "click",
+      "value": null,
+      "selector": "input#txtLoginID",
+      "url": "https://test2.squad1.tech/login"
+    },
+    {
+      "id": 29,
+      "workflow_id": 4,
+      "element_id": 43,
+      "step_order": 3,
+      "action": "type",
+      "value": "admin@talakunchi.com",
+      "selector": "input#txtLoginID",
+      "url": "https://test2.squad1.tech/login"
+    },
+    {
+      "id": 30,
+      "workflow_id": 4,
+      "element_id": 44,
+      "step_order": 4,
+      "action": "click",
+      "value": null,
+      "selector": "input#txtP",
+      "url": "https://test2.squad1.tech/login"
+    },
+    {
+      "id": 31,
+      "workflow_id": 4,
+      "element_id": 45,
+      "step_order": 5,
+      "action": "type",
+      "value": "Admin@12345",
+      "selector": "input#txtP",
+      "url": "https://test2.squad1.tech/login"
+    },
+    {
+      "id": 32,
+      "workflow_id": 4,
+      "element_id": 46,
+      "step_order": 6,
+      "action": "click",
+      "value": null,
+      "selector": "a#loginBtn",
+      "url": "https://test2.squad1.tech/login"
     }
   ],
   "pages": [
     {
       "id": 1,
       "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx",
+      "title": ""
+    },
+    {
+      "id": 2,
+      "url": "https://test2.squad1.tech/login",
       "title": ""
     }
   ],
@@ -954,6 +1211,46 @@
       "text": "",
       "selector": "input#btnShowResult",
       "attributes": "{\"type\": \"image\", \"name\": \"btnShowResult\", \"id\": \"btnShowResult\"}"
+    },
+    {
+      "id": 42,
+      "page_id": 2,
+      "element_type": "input",
+      "text": "",
+      "selector": "input#txtLoginID",
+      "attributes": "{\"type\": \"text\", \"class\": \"form-control login-input\", \"id\": \"txtLoginID\"}"
+    },
+    {
+      "id": 43,
+      "page_id": 2,
+      "element_type": "input",
+      "text": "",
+      "selector": "input#txtLoginID",
+      "attributes": "{\"type\": \"text\", \"class\": \"form-control login-input\", \"placeholder\": \"Email ID\", \"id\": \"txtLoginID\"}"
+    },
+    {
+      "id": 44,
+      "page_id": 2,
+      "element_type": "input",
+      "text": "",
+      "selector": "input#txtP",
+      "attributes": "{\"type\": \"password\", \"class\": \"form-control login-input\", \"id\": \"txtP\"}"
+    },
+    {
+      "id": 45,
+      "page_id": 2,
+      "element_type": "input",
+      "text": "",
+      "selector": "input#txtP",
+      "attributes": "{\"type\": \"password\", \"class\": \"form-control login-input\", \"placeholder\": \"Password\", \"id\": \"txtP\"}"
+    },
+    {
+      "id": 46,
+      "page_id": 2,
+      "element_type": "a",
+      "text": "LOG IN",
+      "selector": "a#loginBtn",
+      "attributes": "{\"href\": \"javascript:void(0)\", \"id\": \"loginBtn\"}"
     }
   ]
 }
