@@ -17,10 +17,75 @@ def _fetch_page_content(url: str) -> dict:
     return {"content": content, "title": title}
 
 
+def _fetch_accessibility_and_elements_sync(url: str) -> dict:
+    """Fetch accessibility snapshot and detailed form elements synchronously."""
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        try:
+            page.goto(url, timeout=30000, wait_until="domcontentloaded")
+            ax_snapshot = page.accessibility.snapshot()
+            
+            elements = []
+            # Gather common form inputs and interactive elements
+            locators = page.locator('input, select, textarea, button, a').all()
+            for loc in locators:
+                try:
+                    tag = loc.evaluate("el => el.tagName.toLowerCase()")
+                    # Skip anchor tags that have no text and no child elements, or keep them
+                    input_type = loc.evaluate("el => el.type || ''")
+                    element_id = loc.evaluate("el => el.id || ''")
+                    name = loc.evaluate("el => el.name || ''")
+                    placeholder = loc.evaluate("el => el.getAttribute('placeholder') || ''")
+                    aria_label = loc.evaluate("el => el.getAttribute('aria-label') || ''")
+                    
+                    label_text = ""
+                    if element_id:
+                        lbl = page.locator(f"label[for='{element_id}']")
+                        if lbl.count() > 0:
+                            label_text = lbl.first.text_content() or ""
+                    if not label_text:
+                        label_text = loc.evaluate("el => { const lbl = el.closest('label'); return lbl ? lbl.textContent : ''; }")
+                    
+                    context = loc.evaluate("el => el.parentElement ? el.parentElement.textContent.slice(0, 150) : ''")
+                    
+                    elements.append({
+                        "tag": tag,
+                        "input_type": input_type,
+                        "element_id": element_id,
+                        "name": name,
+                        "placeholder": placeholder,
+                        "aria_label": aria_label,
+                        "label_text": label_text.strip(),
+                        "context": context.strip()
+                    })
+                except Exception as ex:
+                    print(f"Skipping element info fetch: {ex}")
+            
+            return {
+                "accessibility_tree": ax_snapshot,
+                "elements": elements,
+                "title": page.title()
+            }
+        except Exception as e:
+            return {
+                "accessibility_tree": None,
+                "elements": [],
+                "title": url,
+                "error": str(e)
+            }
+        finally:
+            browser.close()
+
+
 class BrowserService:
     async def get_page_content(self, url: str) -> dict:
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, _fetch_page_content, url)
+
+    async def get_accessibility_and_elements(self, url: str) -> dict:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, _fetch_accessibility_and_elements_sync, url)
 
     async def close(self):
         pass

@@ -76,3 +76,27 @@ class ReplayResponse(BaseModel):
     workflow_id: int
     status: str          # completed | partial | failed
     steps: List[ReplayStepResult]
+
+
+class TestCaseStep(BaseModel):
+    element_id: str
+    action: str
+    value: Optional[str] = None
+
+
+class TestCaseAssertion(BaseModel):
+    type: str
+    expected: str
+
+
+class TestCase(BaseModel):
+    name: str
+    category: str
+    steps: List[TestCaseStep]
+    assertions: List[TestCaseAssertion]
+    confidence: float
+
+
+class GenerateTestsResponse(BaseModel):
+    workflow_id: int
+    test_cases: List[TestCase]

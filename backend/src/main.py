@@ -1,18 +1,16 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .database.connection import create_all_tables
-from .database.vector_db import vector_db_client
 from .api import workflows
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    create_all_tables()
-    try:
-        vector_db_client.create_collections()
-    except Exception as e:
-        print(f"Warning: Could not connect to Qdrant vector DB: {e}. Continuing without it.")
+    # Startup (DB and Qdrant disabled for temporary JSON-only storage mode)
+    # create_all_tables()
+    # try:
+    #     vector_db_client.create_collections()
+    # except Exception as e:
+    #     print(f"Warning: Could not connect to Qdrant vector DB: {e}. Continuing without it.")
     yield
     # Shutdown (nothing to do for now)
 

@@ -1,0 +1,94 @@
+{
+  "workflows": [
+    {
+      "id": 1,
+      "name": "Example Domain [20260617_062230]",
+      "url": "https://example.com",
+      "created_at": "2026-06-17T06:22:30.197865",
+      "test_cases": [
+        {
+          "name": "Example Domain [20260617_062230] Happy Path",
+          "category": "happy_path",
+          "steps": [
+            {
+              "element_id": "input#name",
+              "action": "type",
+              "value": "Test User"
+            },
+            {
+              "element_id": "button#submit",
+              "action": "click",
+              "value": ""
+            }
+          ],
+          "assertions": [
+            {
+              "type": "url_contains",
+              "expected": "https://example.com"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Example Domain [20260617_062230] Empty Inputs Negative Path",
+          "category": "negative",
+          "steps": [],
+          "assertions": [
+            {
+              "type": "error_message_present",
+              "expected": "Required field"
+            }
+          ],
+          "confidence": 0.8
+        }
+      ]
+    }
+  ],
+  "workflow_steps": [
+    {
+      "id": 1,
+      "workflow_id": 1,
+      "element_id": 1,
+      "step_order": 1,
+      "action": "type",
+      "value": "Test User",
+      "selector": "input#name",
+      "url": "https://example.com"
+    },
+    {
+      "id": 2,
+      "workflow_id": 1,
+      "element_id": 2,
+      "step_order": 2,
+      "action": "click",
+      "value": "",
+      "selector": "button#submit",
+      "url": "https://example.com"
+    }
+  ],
+  "pages": [
+    {
+      "id": 1,
+      "url": "https://example.com",
+      "title": ""
+    }
+  ],
+  "elements": [
+    {
+      "id": 1,
+      "page_id": 1,
+      "element_type": "input",
+      "text": "",
+      "selector": "input#name",
+      "attributes": "{}"
+    },
+    {
+      "id": 2,
+      "page_id": 1,
+      "element_type": "button",
+      "text": "Submit Form",
+      "selector": "button#submit",
+      "attributes": "{}"
+    }
+  ]
+}
