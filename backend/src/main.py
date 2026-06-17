@@ -16,15 +16,11 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-# Set up CORS middleware to allow requests from our frontend
-origins = [
-    "http://localhost:3000", # The default port for React's development server
-    "chrome-extension://omngiinkbfmmnjdeljbohnjnihjlipgp"
-]
-
+# Set up CORS middleware to allow requests from our frontend and browser extensions
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["http://localhost:3000"],
+    allow_origin_regex="chrome-extension://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

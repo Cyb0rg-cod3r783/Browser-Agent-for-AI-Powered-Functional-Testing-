@@ -4,35 +4,65 @@ document.addEventListener('DOMContentLoaded', () => {
     const startRecordingBtn = document.getElementById('start-recording');
     const stopRecordingBtn = document.getElementById('stop-recording');
     const recordingStatusDiv = document.getElementById('recording-status');
+    const recordingWfDetails = document.getElementById('recording-wf-details');
+    const recordingStepsCount = document.getElementById('recording-steps-count');
     const workflowListElement = document.getElementById('workflow-list');
     const statusMessageElement = document.getElementById('status-message');
     const clearAllWorkflowsBtn = document.getElementById('clear-all-workflows');
 
     let currentActiveWorkflowId = null;
 
+    // --- Tab Info Fetching ---
+    chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+        const urlElement = document.getElementById('current-url');
+        if (tab && tab.url) {
+            urlElement.textContent = tab.url;
+            urlElement.classList.remove('muted');
+        } else {
+            urlElement.textContent = 'No active tab or restricted URL';
+            urlElement.classList.add('muted');
+        }
+    });
+
     // --- UI State Management ---
     function updateRecordingUI(isRecording) {
         if (isRecording) {
             startRecordingBtn.disabled = true;
             stopRecordingBtn.disabled = false;
-            recordingStatusDiv.textContent = 'Recording active...';
-            recordingStatusDiv.classList.add('recording-active');
+            recordingStatusDiv.classList.remove('hidden');
+            if (currentActiveWorkflowId) {
+                recordingWfDetails.textContent = `Workflow #${currentActiveWorkflowId}`;
+            }
         } else {
             startRecordingBtn.disabled = false;
             stopRecordingBtn.disabled = true;
-            recordingStatusDiv.textContent = '';
-            recordingStatusDiv.classList.remove('recording-active');
+            recordingStatusDiv.classList.add('hidden');
         }
+    }
+
+    // --- Status Messages ---
+    function showStatus(type, title, text) {
+        statusMessageElement.className = `status ${type}`;
+        const icon = statusMessageElement.querySelector('.status-icon');
+        const titleEl = statusMessageElement.querySelector('.status-title');
+        const detailEl = statusMessageElement.querySelector('#status-text');
+        
+        if (icon) icon.textContent = type === 'success' ? '✔' : type === 'error' ? '⚠' : 'ℹ';
+        if (titleEl) titleEl.textContent = title;
+        if (detailEl) detailEl.textContent = text;
+    }
+
+    function clearStatus() {
+        statusMessageElement.className = 'status hidden';
     }
 
     // --- Event Listeners ---
     startRecordingBtn.addEventListener('click', async () => {
-        statusMessageElement.textContent = ''; // Clear general status
+        clearStatus();
         try {
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
             if (!tab || !tab.url) {
-                statusMessageElement.textContent = 'Error: No active tab found.';
-                statusMessageElement.classList.add('error-message');
+                showStatus('error', 'Tab Error', 'No active tab found.');
                 return;
             }
 
@@ -62,21 +92,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.error('Failed to inject or notify content script:', scriptErr);
                     }
                 }
-                statusMessageElement.textContent = `Recording started for Workflow ID: ${currentActiveWorkflowId}`;
-                statusMessageElement.classList.remove('error-message');
+                showStatus('success', 'Recording Started', `Active Workflow ID: ${currentActiveWorkflowId}`);
+                
+                // Track step updates periodically
+                startPollingStepsCount();
             } else {
                 throw new Error(response.error || 'Failed to start recording.');
             }
         } catch (error) {
             console.error('Error starting recording:', error);
-            statusMessageElement.textContent = `Error starting recording: ${error.message}`;
-            statusMessageElement.classList.add('error-message');
+            showStatus('error', 'Recording Error', error.message);
             updateRecordingUI(false);
         }
     });
 
     stopRecordingBtn.addEventListener('click', async () => {
-        statusMessageElement.textContent = ''; // Clear general status
+        clearStatus();
+        stopPollingStepsCount();
         try {
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
@@ -94,16 +126,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.warn('Could not send STOP message to content script:', err);
                     }
                 }
-                statusMessageElement.textContent = 'Recording stopped. Refreshing workflows...';
-                statusMessageElement.classList.remove('error-message');
-                fetchWorkflows(); // Refresh the list to show the new workflow
+                showStatus('success', 'Stopped', 'Recording saved successfully.');
+                fetchWorkflows(); // Refresh the list
             } else {
                 throw new Error(response.error || 'Failed to stop recording.');
             }
         } catch (error) {
             console.error('Error stopping recording:', error);
-            statusMessageElement.textContent = `Error stopping recording: ${error.message}`;
-            statusMessageElement.classList.add('error-message');
+            showStatus('error', 'Error Stopping', error.message);
             updateRecordingUI(true); // Keep recording UI active if stop failed
         }
     });
@@ -112,59 +142,60 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!confirm('Are you sure you want to delete all recorded workflows? This action cannot be undone.')) {
             return;
         }
-        statusMessageElement.textContent = 'Clearing all workflows...';
-        statusMessageElement.classList.remove('error-message');
+        showStatus('info', 'Clearing', 'Deleting all recorded workflows...');
         try {
             const response = await chrome.runtime.sendMessage({ type: 'CLEAR_ALL_WORKFLOWS' });
             if (response.success) {
-                statusMessageElement.textContent = 'All workflows cleared successfully.';
-                statusMessageElement.classList.add('success-message');
+                showStatus('success', 'Cleared', 'All workflows deleted successfully.');
                 fetchWorkflows(); // Refresh the list
             } else {
                 throw new Error(response.error || 'Failed to clear all workflows.');
             }
         } catch (error) {
             console.error('Error clearing all workflows:', error);
-            statusMessageElement.textContent = `Error clearing workflows: ${error.message}`;
-            statusMessageElement.classList.add('error-message');
+            showStatus('error', 'Clear Failed', error.message);
         }
     });
 
     // --- Workflow List and Replay ---
     async function fetchWorkflows() {
-        statusMessageElement.textContent = 'Loading workflows...';
-        statusMessageElement.classList.remove('error-message');
-        workflowListElement.innerHTML = ''; // Clear previous list
+        workflowListElement.innerHTML = '<li class="history-empty">Loading workflows...</li>';
 
         try {
             const response = await chrome.runtime.sendMessage({ type: 'GET_WORKFLOWS' });
             if (response.success) {
                 displayWorkflows(response.workflows);
-                statusMessageElement.textContent = ''; // Clear status message on success
             } else {
                 throw new Error(response.error || 'Failed to fetch workflows.');
             }
         } catch (error) {
             console.error('Error fetching workflows:', error);
-            statusMessageElement.textContent = `Error: Could not connect to backend or fetch workflows. Is the backend running? (${error.message})`;
-            statusMessageElement.classList.add('error-message');
+            showStatus('error', 'Fetch Error', `Could not connect to backend: ${error.message}`);
+            workflowListElement.innerHTML = '<li class="history-empty" style="color: var(--red);">Failed to load workflows.</li>';
         }
     }
 
     function displayWorkflows(workflows) {
         if (workflows.length === 0) {
-            workflowListElement.innerHTML = '<li>No workflows recorded yet.</li>';
+            workflowListElement.innerHTML = '<li class="history-empty">No workflows recorded yet.</li>';
             return;
         }
 
+        workflowListElement.innerHTML = '';
         workflows.forEach(workflow => {
             const listItem = document.createElement('li');
+            listItem.className = 'history-item';
             const workflowName = workflow.name.split(' [')[0]; // Clean up name for display
             const createdAt = new Date(workflow.created_at).toLocaleString();
 
             listItem.innerHTML = `
-                <span>${workflowName} <br> <small>ID: ${workflow.workflow_id} | ${createdAt}</small></span>
-                <button data-workflow-id="${workflow.workflow_id}">Replay</button>
+                <div class="history-item-top">
+                    <span class="history-badge">#${workflow.workflow_id}</span>
+                    <span class="history-name" title="${workflowName}">${workflowName}</span>
+                    <button data-workflow-id="${workflow.workflow_id}" class="btn-clear" style="padding: 3px 8px; font-size: 11px; font-weight: 700; border-color: var(--accent); color: var(--accent);">Replay</button>
+                </div>
+                <div class="history-url" title="${workflow.url}">${workflow.url}</div>
+                <div class="history-time">${createdAt}</div>
             `;
             workflowListElement.appendChild(listItem);
         });
@@ -178,8 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function replayWorkflow(workflowId) {
-        statusMessageElement.textContent = `Initiating replay for Workflow ID: ${workflowId}...`;
-        statusMessageElement.classList.remove('error-message');
+        showStatus('info', 'Replaying', `Replaying workflow #${workflowId} inside active tab...`);
 
         try {
             const response = await chrome.runtime.sendMessage({
@@ -189,31 +219,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.success) {
                 const result = response.result;
-                statusMessageElement.textContent = `Replay completed with status: ${result.status}!`;
-                statusMessageElement.classList.remove('error-message');
-                if (result.status !== 'completed') {
-                    statusMessageElement.classList.add('error-message');
-                }
+                showStatus('success', 'Replay Success', `Status: ${result.status || 'completed'}`);
             } else {
                 throw new Error(response.error || 'Failed to replay workflow.');
             }
         } catch (error) {
             console.error('Error replaying workflow:', error);
-            statusMessageElement.textContent = `Replay failed: ${error.message}`;
-            statusMessageElement.classList.add('error-message');
+            showStatus('error', 'Replay Failed', error.message);
+        }
+    }
+
+    // --- Polling Active Steps count ---
+    let pollInterval = null;
+    function startPollingStepsCount() {
+        if (pollInterval) clearInterval(pollInterval);
+        
+        const fetchCount = async () => {
+            if (!currentActiveWorkflowId) return;
+            try {
+                const response = await fetch(`http://localhost:8000/api/v1/workflows/${currentActiveWorkflowId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const count = data.steps ? data.steps.length : 0;
+                    recordingStepsCount.textContent = `${count} action${count !== 1 ? 's' : ''} recorded`;
+                }
+            } catch (err) {
+                console.warn('Error fetching step count:', err);
+            }
+        };
+
+        fetchCount();
+        pollInterval = setInterval(fetchCount, 2000);
+    }
+
+    function stopPollingStepsCount() {
+        if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
         }
     }
 
     // --- Initialization ---
     async function initializePopup() {
-        // Check if recording is already active (e.g., if popup was closed and reopened)
-        const response = await chrome.runtime.sendMessage({ type: 'GET_ACTIVE_WORKFLOW_ID' });
-        if (response && response.activeWorkflowId) {
-            currentActiveWorkflowId = response.activeWorkflowId;
-            updateRecordingUI(true);
-            recordingStatusDiv.textContent = `Recording active (Workflow ID: ${currentActiveWorkflowId})...`;
-            recordingStatusDiv.classList.add('recording-active');
-        } else {
+        try {
+            const response = await chrome.runtime.sendMessage({ type: 'GET_ACTIVE_WORKFLOW_ID' });
+            if (response && response.activeWorkflowId) {
+                currentActiveWorkflowId = response.activeWorkflowId;
+                updateRecordingUI(true);
+                startPollingStepsCount();
+            } else {
+                updateRecordingUI(false);
+            }
+        } catch (err) {
+            console.warn('Failed to fetch active workflow:', err);
             updateRecordingUI(false);
         }
         fetchWorkflows();

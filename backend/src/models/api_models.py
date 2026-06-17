@@ -97,6 +97,49 @@ class TestCase(BaseModel):
     confidence: float
 
 
+class GenerateTestsRequest(BaseModel):
+    instructions: Optional[str] = None
+
+
 class GenerateTestsResponse(BaseModel):
     workflow_id: int
     test_cases: List[TestCase]
+
+
+class SetupStatusResponse(BaseModel):
+    database: str
+    groq_configured: bool
+    gemini_configured: bool
+
+
+# ── Test Case Replay ──────────────────────────────────────────────────────────
+
+class ReplayTestCaseRequest(BaseModel):
+    test_case_index: int  # index of the test case in the workflow's test_cases list
+
+
+class AssertionResult(BaseModel):
+    type: str
+    expected: str
+    passed: bool
+    message: Optional[str] = None
+
+
+class ReplayTestCaseStepResult(BaseModel):
+    step_index: int
+    element_id: str
+    action: str
+    value: Optional[str] = None
+    status: str           # success | failed | skipped
+    error: Optional[str] = None
+
+
+class ReplayTestCaseResponse(BaseModel):
+    workflow_id: int
+    test_case_name: str
+    test_case_category: str
+    status: str           # passed | failed | error
+    steps: List[ReplayTestCaseStepResult]
+    assertions: List[AssertionResult]
+    duration_ms: Optional[int] = None
+    screenshot_b64: Optional[str] = None  # base64 PNG taken after replay

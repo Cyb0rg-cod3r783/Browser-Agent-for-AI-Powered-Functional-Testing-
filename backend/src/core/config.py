@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     # Format: mysql+mysqlconnector://<user>:<password>@<host>:<port>/<dbname>
     DATABASE_URL: str
     GEMINI_API_KEY: Optional[str] = None
+    GROQ_API_KEY: Optional[str] = None
+    GROQ_MODEL: Optional[str] = "llama-3.1-8b-instant"
 
     class Config:
         env_file = ".env"

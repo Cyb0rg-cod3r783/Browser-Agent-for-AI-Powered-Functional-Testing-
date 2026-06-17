@@ -1,15 +1,18 @@
 import json
+import re
 import traceback
 from datetime import datetime
 from typing import List
-
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 
 from ..models.api_models import (
     StartRecordingRequest, WorkflowResponse,
     RecordActionRequest, StopRecordingRequest,
     WorkflowDetail, WorkflowStepOut,
-    TestCase, GenerateTestsResponse
+    TestCase, GenerateTestsResponse, GenerateTestsRequest, SetupStatusResponse,
+    ReplayResponse, ReplayStepResult,
+    ReplayTestCaseRequest, ReplayTestCaseResponse,
+    ReplayTestCaseStepResult, AssertionResult
 )
 from ..services.browser_service import BrowserService, ReplayService
 from ..services.llm_service import llm_service
@@ -131,8 +134,21 @@ def list_workflows():
 
 @router.delete("/workflows/clear_all")
 def clear_all_workflows():
-    json_db.clear_all()
-    return {"status": "all workflows cleared"}
+    try:
+        json_db.clear_all()
+        return {"message": "All workflows cleared."}
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(500, detail=f"Failed to clear workflows: {e}")
+
+@router.get("/setup/status", response_model=SetupStatusResponse)
+async def get_setup_status():
+    from ..core.config import settings
+    return SetupStatusResponse(
+        database="MySQL" if "mysql" in (settings.DATABASE_URL or "") else "SQLite/JSON",
+        groq_configured=bool(settings.GROQ_API_KEY),
+        gemini_configured=bool(settings.GEMINI_API_KEY)
+    )
 
 
 # ── 6. Get workflow detail (with steps) ───────────────────────────────────────
@@ -172,32 +188,56 @@ def get_workflow(workflow_id: int):
 
 # ── 7. Replay a workflow ──────────────────────────────────────────────────────
 
-@router.post("/workflows/{workflow_id}/replay", response_model=List[WorkflowStepOut])
-async def replay_workflow(workflow_id: int):
+@router.post("/workflows/{workflow_id}/replay", response_model=ReplayResponse)
+async def replay_workflow(
+    workflow_id: int,
+    replay_service: ReplayService = Depends(get_replay_service)
+):
     wf = json_db.get_workflow(workflow_id)
     if not wf:
         raise HTTPException(404, detail="Workflow not found")
 
-    steps_out = []
-    for s in wf.get("steps", []):
-        el_text = None
-        el_type = None
-        if s.get("element"):
-            el_text = s["element"].get("text")
-            el_type = s["element"].get("element_type")
-        steps_out.append(
-            WorkflowStepOut(
-                id=s["id"],
-                step_order=s["step_order"],
-                action=s["action"],
-                selector=s.get("selector"),
-                value=s.get("value"),
-                url=s.get("url"),
-                element_type=el_type,
-                element_text=el_text,
-            )
-        )
-    return steps_out
+    steps = wf.get("steps", [])
+    if not steps:
+        return ReplayResponse(workflow_id=workflow_id, status="completed", steps=[])
+
+    try:
+        # Replay the steps using server-side Playwright
+        step_results = await replay_service.replay(wf["url"], steps)
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(500, detail=f"Replay execution failed: {e}")
+
+    # Determine overall status based on step outcomes
+    success_count = sum(1 for r in step_results if r.get("status") == "success")
+    failed_count = sum(1 for r in step_results if r.get("status") == "failed")
+    
+    if failed_count > 0:
+        if success_count > 0:
+            overall_status = "partial"
+        else:
+            overall_status = "failed"
+    else:
+        overall_status = "completed"
+
+    # Format into ReplayStepResult schema
+    formatted_steps = []
+    for r in step_results:
+        formatted_steps.append(ReplayStepResult(
+            step_order=r["step_order"],
+            action=r["action"],
+            selector=r.get("selector"),
+            value=r.get("value"),
+            status=r["status"],
+            error=r.get("error")
+        ))
+
+    return ReplayResponse(
+        workflow_id=workflow_id,
+        status=overall_status,
+        steps=formatted_steps
+    )
+
 
 
 # ── 8. Delete a workflow ──────────────────────────────────────────────────────
@@ -215,6 +255,7 @@ def delete_workflow(workflow_id: int):
 @router.post("/workflows/{workflow_id}/generate_tests", response_model=GenerateTestsResponse)
 async def generate_workflow_tests(
     workflow_id: int,
+    request: GenerateTestsRequest = Body(default=GenerateTestsRequest()),
     browser_service: BrowserService = Depends(get_browser_service)
 ):
     workflow = json_db.get_workflow(workflow_id)
@@ -251,22 +292,26 @@ async def generate_workflow_tests(
         })
 
     # 3. Generate test cases using LLM
-    observed_steps = []
+    steps = []
     for s in workflow.get("steps", []):
-        observed_steps.append({
+        steps.append({
             "action": s.get("action"),
             "selector": s.get("selector"),
             "value": s.get("value")
         })
 
-    expected_outcome = "Page loaded and user action completed successfully."
-    test_suite = await llm_service.generate_test_cases(
-        flow_name=workflow["name"],
-        start_url=workflow["url"],
-        steps=observed_steps,
-        elements=labeled_elements,
-        expected_outcome=expected_outcome
-    )
+    # Generate test cases with LLM
+    try:
+        test_suite = await llm_service.generate_test_cases(
+            flow_name=workflow["name"],
+            start_url=workflow["url"],
+            steps=steps,
+            elements=labeled_elements,
+            expected_outcome="User successfully completed the flow.",
+            instructions=request.instructions
+        )
+    except Exception as e:
+        raise HTTPException(500, detail=f"Failed to generate tests: {e}")
 
     test_cases = test_suite.get("test_cases", [])
 
@@ -284,3 +329,167 @@ async def get_workflow_test_cases(workflow_id: int):
     if not workflow:
         raise HTTPException(404, detail="Workflow not found")
     return workflow.get("test_cases", [])
+
+
+# ── 12. Run all test cases in one shot ───────────────────────────────────────
+
+@router.post("/workflows/{workflow_id}/run_all_tests")
+async def run_all_tests(
+    workflow_id: int,
+    replay_service: ReplayService = Depends(get_replay_service),
+):
+    wf = json_db.get_workflow(workflow_id)
+    if not wf:
+        raise HTTPException(404, detail="Workflow not found")
+
+    test_cases = wf.get("test_cases", [])
+    if not test_cases:
+        raise HTTPException(400, detail="No test cases generated yet. Call /generate_tests first.")
+
+    results = []
+    for idx, tc in enumerate(test_cases):
+        action_map = {"fill": "fill", "click": "click", "check": "check",
+                      "select": "select", "navigate": "navigate"}
+        replay_steps = []
+        for i, step in enumerate(tc.get("steps", [])):
+            action = action_map.get(step["action"], step["action"])
+            eid = step["element_id"]
+            if action == "navigate":
+                selector = None
+            elif re.search(r'[#\.\[\]>:\s]', eid) or eid.lower() in ("html", "body"):
+                selector = eid
+            else:
+                safe = eid.replace("'", "\\'")
+                selector = f"#{safe}, [name='{safe}'], [placeholder='{safe}']"
+            replay_steps.append({"step_order": i + 1, "action": action,
+                                  "selector": selector, "value": step.get("value"),
+                                  "url": wf["url"], "element_id": eid})
+
+        start = datetime.utcnow()
+        try:
+            raw = await replay_service.replay_test_case(wf["url"], replay_steps, tc.get("assertions", []))
+        except Exception as e:
+            results.append({"index": idx, "name": tc["name"], "category": tc["category"],
+                             "status": "error", "error": str(e), "duration_ms": 0,
+                             "steps": [], "assertions": []})
+            continue
+        duration_ms = int((datetime.utcnow() - start).total_seconds() * 1000)
+
+        has_failure = any(r["status"] == "failed" for r in raw.get("step_results", []))
+        assertions_passed = all(a["passed"] for a in raw.get("assertion_results", [])) \
+            if raw.get("assertion_results") else (not has_failure)
+        status = "passed" if (not has_failure and assertions_passed) else "failed"
+
+        results.append({
+            "index": idx,
+            "name": tc["name"],
+            "category": tc["category"],
+            "status": status,
+            "duration_ms": duration_ms,
+            "steps": raw.get("step_results", []),
+            "assertions": raw.get("assertion_results", []),
+            "screenshot_b64": raw.get("screenshot_b64"),
+        })
+
+    total    = len(results)
+    passed   = sum(1 for r in results if r["status"] == "passed")
+    failed   = total - passed
+    return {
+        "workflow_id": workflow_id,
+        "total": total, "passed": passed, "failed": failed,
+        "results": results,
+    }
+
+@router.post("/workflows/{workflow_id}/replay_test_case", response_model=ReplayTestCaseResponse)
+async def replay_test_case(
+    workflow_id: int,
+    request: ReplayTestCaseRequest,
+    replay_service: ReplayService = Depends(get_replay_service),
+):
+    wf = json_db.get_workflow(workflow_id)
+    if not wf:
+        raise HTTPException(404, detail="Workflow not found")
+
+    test_cases = wf.get("test_cases", [])
+    if request.test_case_index < 0 or request.test_case_index >= len(test_cases):
+        raise HTTPException(400, detail="Invalid test case index")
+
+    test_case = test_cases[request.test_case_index]
+
+    # Build Playwright steps from AI test case steps
+    action_map = {"fill": "fill", "click": "click", "check": "check",
+                  "select": "select", "navigate": "navigate"}
+
+    replay_steps = []
+    for i, step in enumerate(test_case.get("steps", [])):
+        action = action_map.get(step["action"], step["action"])
+        eid = step["element_id"]
+
+        if action == "navigate":
+            selector = None
+        elif re.search(r'[#\.\[\]>:\s]', eid) or eid.lower() in ("html", "body"):
+            selector = eid
+        else:
+            safe = eid.replace("'", "\\'")
+            selector = f"#{safe}, [name='{safe}'], [placeholder='{safe}']"
+
+        replay_steps.append({
+            "step_order": i + 1,
+            "action": action,
+            "selector": selector,
+            "value": step.get("value"),
+            "url": wf["url"],
+            "element_id": eid,
+        })
+
+    assertions = test_case.get("assertions", [])
+
+    start_time = datetime.utcnow()
+    try:
+        raw = await replay_service.replay_test_case(wf["url"], replay_steps, assertions)
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(500, detail=f"Replay execution failed: {e}")
+    end_time = datetime.utcnow()
+    duration_ms = int((end_time - start_time).total_seconds() * 1000)
+
+    step_results = raw.get("step_results", [])
+    assertion_results = raw.get("assertion_results", [])
+
+    formatted_steps = []
+    has_failure = False
+    for r, orig in zip(step_results, replay_steps):
+        if r["status"] == "failed":
+            has_failure = True
+        formatted_steps.append(ReplayTestCaseStepResult(
+            step_index=r["step_order"] - 1,
+            element_id=orig["element_id"],
+            action=orig["action"],
+            value=r.get("value"),
+            status=r["status"],
+            error=r.get("error"),
+        ))
+
+    formatted_assertions = [
+        AssertionResult(
+            type=ar["type"],
+            expected=ar["expected"],
+            passed=ar["passed"],
+            message=ar.get("message", ""),
+        )
+        for ar in assertion_results
+    ]
+
+    assertions_passed = all(ar["passed"] for ar in assertion_results) if assertion_results else (not has_failure)
+    status = "passed" if (not has_failure and assertions_passed) else "failed"
+
+    return ReplayTestCaseResponse(
+        workflow_id=workflow_id,
+        test_case_name=test_case["name"],
+        test_case_category=test_case["category"],
+        status=status,
+        steps=formatted_steps,
+        assertions=formatted_assertions,
+        duration_ms=duration_ms,
+        screenshot_b64=raw.get("screenshot_b64"),
+    )

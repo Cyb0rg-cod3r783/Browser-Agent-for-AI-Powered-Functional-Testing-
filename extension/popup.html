@@ -1,178 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>Workflow Replayer</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            width: 320px; /* Slightly wider for better spacing */
-            padding: 15px;
-            background-color: #f0f2f5; /* Light grey background */
-            color: #333;
-            margin: 0;
-        }
-        h3, h4 {
-            color: #2c3e50; /* Darker blue-grey for headings */
-            margin-top: 0;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .section-title {
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 5px;
-            margin-bottom: 15px;
-        }
-
-        /* Control Buttons (Start/Stop Recording) */
-        .controls {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-        }
-        .controls button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            flex-grow: 1;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        #start-recording {
-            background-color: #28a745; /* Green */
-            color: white;
-        }
-        #start-recording:hover:not(:disabled) {
-            background-color: #218838;
-            transform: translateY(-1px);
-        }
-        #stop-recording {
-            background-color: #dc3545; /* Red */
-            color: white;
-        }
-        #stop-recording:hover:not(:disabled) {
-            background-color: #c82333;
-            transform: translateY(-1px);
-        }
-        .controls button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        /* Recording Status */
-        #recording-status {
-            margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: bold;
-            background-color: #e9ecef; /* Light grey */
-            color: #6c757d; /* Darker grey */
-            border: 1px solid #dee2e6;
-        }
-        .recording-active {
-            background-color: #fff3cd; /* Light yellow */
-            color: #856404; /* Dark yellow */
-            border-color: #ffeeba;
-        }
-
-        /* Workflow List */
-        #workflow-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        #workflow-list li {
-            background-color: #ffffff;
-            border: 1px solid #e0e0e0;
-            margin-bottom: 8px;
-            padding: 10px 12px;
-            display: flex;
-            flex-direction: column; /* Stack name and button vertically on small screens */
-            align-items: flex-start;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            transition: transform 0.1s ease;
-        }
-        #workflow-list li:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 6px rgba(0,0,0,0.12);
-        }
-        #workflow-list li span {
-            flex-grow: 1;
-            margin-bottom: 8px; /* Space between text and button */
-            font-size: 14px;
-            color: #34495e;
-            word-break: break-word; /* Prevent long URLs from overflowing */
-        }
-        #workflow-list li small {
-            font-size: 11px;
-            color: #7f8c8d;
-        }
-        #workflow-list li button {
-            background-color: #007bff; /* Blue for replay */
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 12px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.2s ease;
-            align-self: flex-end; /* Align button to the right */
-        }
-        #workflow-list li button:hover {
-            background-color: #0056b3;
-        }
-
-        /* General Status Messages */
-        #status-message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            font-size: 13px;
-            background-color: #e7f3ff; /* Light blue */
-            color: #004085; /* Dark blue */
-            border: 1px solid #b8daff;
-        }
-        .error-message {
-            background-color: #f8d7da; /* Light red */
-            color: #721c24; /* Dark red */
-            border-color: #f5c6cb;
-        }
-        .success-message {
-            background-color: #d4edda; /* Light green */
-            color: #155724; /* Dark green */
-            border-color: #c3e6cb;
-        }
-    </style>
+    <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-    <h3>Workflow Automation</h3>
+    <div class="popup">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <span class="logo-icon">⚙</span>
+                <span>WorkflowBot</span>
+            </div>
+            <span class="version">v1.0.0</span>
+        </div>
 
-    <div class="controls">
-        <button id="start-recording">Start Recording</button>
-        <button id="stop-recording" disabled>Stop Recording</button>
+        <!-- Current Tab Display -->
+        <div class="section">
+            <div class="section-label">Current Tab</div>
+            <div class="url-display">
+                <span class="url-favicon">🌐</span>
+                <span id="current-url" class="url-text">Loading active tab...</span>
+            </div>
+        </div>
+
+        <!-- Active Recording Block -->
+        <div id="recording-status" class="recording-info hidden">
+            <div class="ri-label">
+                <span class="dot-white" style="display: inline-block; vertical-align: middle; margin-right: 6px;"></span>
+                Recording Active
+            </div>
+            <div id="recording-wf-details" class="ri-id">Initializing...</div>
+            <div id="recording-steps-count" class="ri-steps">0 actions recorded</div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="section" style="border-bottom: none; padding-top: 10px; padding-bottom: 10px;">
+            <div class="controls" style="padding: 0; display: flex; gap: 8px;">
+                <button id="start-recording" class="btn-record">
+                    ⏺ Start Recording
+                </button>
+                <button id="stop-recording" class="btn-stop" disabled>
+                    ⏹ Stop Recording
+                </button>
+            </div>
+        </div>
+
+        <!-- Status Message Indicator -->
+        <div id="status-message" class="status hidden">
+            <span class="status-icon">ℹ</span>
+            <div class="status-body">
+                <span class="status-title">System Message</span>
+                <span id="status-text" class="status-detail">Ready</span>
+            </div>
+        </div>
+
+        <!-- History/List Section -->
+        <div class="section history-section">
+            <div class="section-header">
+                <div class="section-label">Recorded Workflows</div>
+                <button id="clear-all-workflows" class="btn-clear">Clear All</button>
+            </div>
+            <ul id="workflow-list" class="history-list">
+                <li class="history-empty">Loading workflows...</li>
+            </ul>
+        </div>
     </div>
 
-    <div id="recording-status"></div>
-
-    <h4 class="section-title">Recorded Workflows</h4>
-    <div id="status-message">Loading workflows...</div>
-    <ul id="workflow-list">
-        <!-- Workflows will be loaded here by JavaScript -->
-    </ul>
-
-    <div style="margin-top: 20px; text-align: center;">
-        <button id="clear-all-workflows" style="background-color: #ffc107; color: #333; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;">Clear All Workflows</button>
-    </div>
-
-    <script src="popup.js"></script> <!-- Link to your JavaScript file -->
+    <script src="popup.js"></script>
 </body>
 </html>

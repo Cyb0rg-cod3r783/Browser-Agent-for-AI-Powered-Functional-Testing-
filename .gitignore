@@ -1,3 +1,20 @@
 backend/venv
 backend/venv2
+.venv
 .vscode
+
+# Never commit secrets
+.env
+*.env
+backend/.env
+
+# Database file
+backend/workflows_db.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Node
+node_modules/

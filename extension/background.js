@@ -154,9 +154,9 @@ async function stopRecordingWorkflow() {
 // Function to replay a workflow
 async function replayWorkflow(workflowId) {
     try {
-        // Fetch the workflow steps from the backend
-        const response = await fetch(`http://localhost:8000/api/v1/workflows/${workflowId}/replay`, {
-            method: 'POST',
+        // Fetch the workflow details from the backend to get the steps
+        const response = await fetch(`http://localhost:8000/api/v1/workflows/${workflowId}`, {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -164,9 +164,10 @@ async function replayWorkflow(workflowId) {
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Backend replay failed: ${response.status} - ${errorText}`);
+            throw new Error(`Backend fetch workflow failed: ${response.status} - ${errorText}`);
         }
-        const replaySteps = await response.json(); // This should be the list of actions to replay
+        const workflowDetail = await response.json();
+        const replaySteps = workflowDetail.steps || []; // This is the list of actions to replay
 
         console.log('Replaying workflow steps:', replaySteps);
 

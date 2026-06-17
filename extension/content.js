@@ -210,6 +210,10 @@ function recordTypeAction(target, value) {
     const selector = getCssSelector(target);
     const elementText = target.innerText.trim().substring(0, 255);
     const elementType = target.tagName.toLowerCase();
+    
+    // Dynamically assign action type based on element
+    const actionType = elementType === 'select' ? 'select' : 'type';
+
     const attributes = {};
     for (let i = 0; i < target.attributes.length; i++) {
         const attr = target.attributes[i];
@@ -221,7 +225,7 @@ function recordTypeAction(target, value) {
     chrome.runtime.sendMessage({
         type: 'RECORD_ACTION',
         payload: {
-            action: 'type',
+            action: actionType,
             selector: selector,
             element_type: elementType,
             element_text: elementText,
