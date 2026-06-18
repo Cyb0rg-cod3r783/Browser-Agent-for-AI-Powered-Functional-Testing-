@@ -1,5 +1,6 @@
 import json
 import re
+import asyncio
 import traceback
 from datetime import datetime
 from typing import List
@@ -291,7 +292,7 @@ async def generate_workflow_tests(
             "stable_locator_ranking": labeled.get("stable_locator_ranking")
         })
 
-    # 3. Generate test cases using LLM
+    # 3. Build steps list from recording
     steps = []
     for s in workflow.get("steps", []):
         steps.append({
@@ -300,13 +301,63 @@ async def generate_workflow_tests(
             "value": s.get("value")
         })
 
+    # 4. Extract what the user actually typed during recording
+    #    Map: selector → { value, inferred_type }
+    recorded_values: dict = {}
+    for s in workflow.get("steps", []):
+        if s.get("action") in ("fill", "type") and s.get("value"):
+            sel   = s.get("selector") or ""
+            val   = s.get("value", "")
+            eid   = s.get("element_id") or sel
+
+            # Infer field type from the recorded value
+            import re as _re
+            if _re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', val):
+                inferred = "email"
+            elif len(val) >= 6 and any(c.isupper() for c in val) and any(c.isdigit() for c in val):
+                inferred = "password"
+            elif val.replace("+","").replace("-","").replace(" ","").replace("(","").replace(")","").isdigit() and len(val) >= 7:
+                inferred = "phone"
+            elif val.isdigit():
+                inferred = "number"
+            elif _re.match(r'^\d{4}-\d{2}-\d{2}$', val):
+                inferred = "date"
+            elif val.startswith("http"):
+                inferred = "url"
+            else:
+                inferred = "text"
+
+            recorded_values[eid] = {"value": val, "inferred_type": inferred}
+
+    # 5. Build enriched elements — merge page elements with recorded values
+    enriched_elements = []
+    raw_elements = page_info.get("elements", [])
+    for i, labeled in enumerate(labeled_elements):
+        raw = raw_elements[i] if i < len(raw_elements) else {}
+        eid = labeled.get("element_id") or raw.get("element_id") or raw.get("name") or ""
+
+        # Look up if user typed something into this element during recording
+        recorded = recorded_values.get(eid) or recorded_values.get(f"#{eid}") or \
+                   recorded_values.get(f"[name='{eid}']") or {}
+
+        enriched_elements.append({
+            **labeled,
+            "tag":          raw.get("tag", "input"),
+            "input_type":   raw.get("input_type", "text"),
+            "name":         raw.get("name", ""),
+            "placeholder":  raw.get("placeholder", ""),
+            # Key addition: what the user actually typed + inferred type
+            "recorded_value":         recorded.get("value"),
+            "recorded_value_type":    recorded.get("inferred_type"),
+        })
+
     # Generate test cases with LLM
     try:
         test_suite = await llm_service.generate_test_cases(
             flow_name=workflow["name"],
             start_url=workflow["url"],
             steps=steps,
-            elements=labeled_elements,
+            elements=enriched_elements,
             expected_outcome="User successfully completed the flow.",
             instructions=request.instructions
         )
@@ -331,7 +382,86 @@ async def get_workflow_test_cases(workflow_id: int):
     return workflow.get("test_cases", [])
 
 
-# ── 12. Run all test cases in one shot ───────────────────────────────────────
+# ── 12. Run all test cases — parallel batches with per-test timeout ──────────
+
+BATCH_SIZE    = 5   # run 5 tests simultaneously
+TEST_TIMEOUT  = 30  # seconds per individual test before it's marked "timeout"
+
+def _build_replay_steps(tc: dict, start_url: str) -> list:
+    """Convert AI test case steps into Playwright replay step dicts."""
+    action_map = {"fill": "fill", "click": "click", "check": "check",
+                  "select": "select", "navigate": "navigate"}
+    replay_steps = []
+    for i, step in enumerate(tc.get("steps", [])):
+        action = action_map.get(step["action"], step["action"])
+        eid    = step["element_id"]
+        if action == "navigate":
+            selector = None
+        elif re.search(r'[#\.\[\]>:\s]', eid) or eid.lower() in ("html", "body"):
+            selector = eid
+        else:
+            safe = eid.replace("'", "\\'")
+            selector = (
+                f"#{safe}, [name='{safe}'], [placeholder='{safe}'], "
+                f"[value='{safe}'], input[type='submit'], button[type='submit'], button"
+            )
+        replay_steps.append({
+            "step_order": i + 1, "action": action,
+            "selector": selector, "value": step.get("value"),
+            "url": start_url, "element_id": eid,
+        })
+    return replay_steps
+
+
+async def _run_one(idx: int, tc: dict, start_url: str,
+                   replay_service: ReplayService) -> dict:
+    """Run a single test case with a timeout."""
+    replay_steps = _build_replay_steps(tc, start_url)
+    start = datetime.utcnow()
+    try:
+        raw = await asyncio.wait_for(
+            replay_service.replay_test_case(start_url, replay_steps, tc.get("assertions", [])),
+            timeout=TEST_TIMEOUT,
+        )
+    except asyncio.TimeoutError:
+        return {
+            "index": idx, "name": tc["name"], "category": tc["category"],
+            "status": "failed", "duration_ms": TEST_TIMEOUT * 1000,
+            "steps": [], "assertions": [],
+            "screenshot_b64": None,
+            "error": f"Test timed out after {TEST_TIMEOUT}s",
+        }
+    except Exception as e:
+        return {
+            "index": idx, "name": tc["name"], "category": tc["category"],
+            "status": "error", "duration_ms": 0,
+            "steps": [], "assertions": [],
+            "screenshot_b64": None,
+            "error": str(e),
+        }
+
+    duration_ms = int((datetime.utcnow() - start).total_seconds() * 1000)
+    has_failure = any(r["status"] == "failed" for r in raw.get("step_results", []))
+    tc_category = tc.get("category", "happy_path")
+    ar_list     = raw.get("assertion_results", [])
+
+    if ar_list:
+        assertions_passed = all(a["passed"] for a in ar_list)
+        if tc_category == "happy_path":
+            status = "passed" if (not has_failure and assertions_passed) else "failed"
+        else:
+            status = "passed" if assertions_passed else "failed"
+    else:
+        status = "passed" if not has_failure else "failed"
+
+    return {
+        "index": idx, "name": tc["name"], "category": tc["category"],
+        "status": status, "duration_ms": duration_ms,
+        "steps": raw.get("step_results", []),
+        "assertions": raw.get("assertion_results", []),
+        "screenshot_b64": raw.get("screenshot_b64"),
+    }
+
 
 @router.post("/workflows/{workflow_id}/run_all_tests")
 async def run_all_tests(
@@ -344,65 +474,24 @@ async def run_all_tests(
 
     test_cases = wf.get("test_cases", [])
     if not test_cases:
-        raise HTTPException(400, detail="No test cases generated yet. Call /generate_tests first.")
+        raise HTTPException(400, detail="No test cases generated yet.")
 
     results = []
-    for idx, tc in enumerate(test_cases):
-        action_map = {"fill": "fill", "click": "click", "check": "check",
-                      "select": "select", "navigate": "navigate"}
-        replay_steps = []
-        for i, step in enumerate(tc.get("steps", [])):
-            action = action_map.get(step["action"], step["action"])
-            eid = step["element_id"]
-            if action == "navigate":
-                selector = None
-            elif re.search(r'[#\.\[\]>:\s]', eid) or eid.lower() in ("html", "body"):
-                selector = eid
-            else:
-                safe = eid.replace("'", "\\'")
-                selector = f"#{safe}, [name='{safe}'], [placeholder='{safe}']"
-            replay_steps.append({"step_order": i + 1, "action": action,
-                                  "selector": selector, "value": step.get("value"),
-                                  "url": wf["url"], "element_id": eid})
 
-        start = datetime.utcnow()
-        try:
-            raw = await replay_service.replay_test_case(wf["url"], replay_steps, tc.get("assertions", []))
-        except Exception as e:
-            results.append({"index": idx, "name": tc["name"], "category": tc["category"],
-                             "status": "error", "error": str(e), "duration_ms": 0,
-                             "steps": [], "assertions": []})
-            continue
-        duration_ms = int((datetime.utcnow() - start).total_seconds() * 1000)
+    # Process in batches of BATCH_SIZE concurrently
+    for batch_start in range(0, len(test_cases), BATCH_SIZE):
+        batch = list(enumerate(test_cases))[batch_start : batch_start + BATCH_SIZE]
+        batch_results = await asyncio.gather(*[
+            _run_one(idx, tc, wf["url"], replay_service)
+            for idx, tc in batch
+        ])
+        results.extend(batch_results)
+        print(f"[RunAll] Batch {batch_start // BATCH_SIZE + 1} done "
+              f"({batch_start + len(batch)}/{len(test_cases)})")
 
-        has_failure = any(r["status"] == "failed" for r in raw.get("step_results", []))
-        tc_category = tc.get("category", "happy_path")
-        ar_list = raw.get("assertion_results", [])
-
-        if ar_list:
-            assertions_passed = all(a["passed"] for a in ar_list)
-            if tc_category == "happy_path":
-                status = "passed" if (not has_failure and assertions_passed) else "failed"
-            else:
-                # For negative/edge/security: assertions decide, not step failures
-                status = "passed" if assertions_passed else "failed"
-        else:
-            status = "passed" if not has_failure else "failed"
-
-        results.append({
-            "index": idx,
-            "name": tc["name"],
-            "category": tc["category"],
-            "status": status,
-            "duration_ms": duration_ms,
-            "steps": raw.get("step_results", []),
-            "assertions": raw.get("assertion_results", []),
-            "screenshot_b64": raw.get("screenshot_b64"),
-        })
-
-    total    = len(results)
-    passed   = sum(1 for r in results if r["status"] == "passed")
-    failed   = total - passed
+    total  = len(results)
+    passed = sum(1 for r in results if r["status"] == "passed")
+    failed = total - passed
     return {
         "workflow_id": workflow_id,
         "total": total, "passed": passed, "failed": failed,

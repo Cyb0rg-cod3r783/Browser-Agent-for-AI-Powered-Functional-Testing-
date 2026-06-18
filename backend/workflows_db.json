@@ -2,259 +2,1226 @@
   "workflows": [
     {
       "id": 1,
-      "name": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx [20260617_092244]",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx",
-      "created_at": "2026-06-17T09:22:44.144501",
+      "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322]",
+      "url": "https://test2.squad1.tech/login",
+      "created_at": "2026-06-17T17:33:22.651573",
       "test_cases": [
         {
-          "name": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx [20260617_092244] Happy Path",
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Happy Path",
           "category": "happy_path",
+          "description": "Reproduce recorded flow",
           "steps": [
             {
-              "element_id": "step-0",
-              "action": "navigate",
-              "value": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "Hello World"
             },
             {
-              "element_id": "select#ddlEnrollOrSeatNo",
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "Hello World"
+            },
+            {
+              "element_id": "input#txtLoginID",
               "action": "click",
               "value": null
-            },
-            {
-              "element_id": "select#ddlEnrollOrSeatNo",
-              "action": "type",
-              "value": "2"
-            },
-            {
-              "element_id": "select#ddlEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#txtEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#txtEnrollOrSeatNo",
-              "action": "type",
-              "value": "24111000014"
-            },
-            {
-              "element_id": "input#txtCaptchaHot",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#txtCaptchaHot",
-              "action": "type",
-              "value": "Qrr7CRsG"
-            },
-            {
-              "element_id": "input#btnShowResult",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "step-9",
-              "action": "navigate",
-              "value": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
             }
           ],
           "assertions": [
             {
-              "type": "url_contains",
-              "expected": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
+              "type": "no_error_message",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "error"
+            }
+          ],
+          "confidence": 0.88
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Alternative Valid Data",
+          "category": "happy_path",
+          "description": "Different valid values",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "AltUser123!"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "AltUser123!"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.82
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Minimal Valid Input",
+          "category": "happy_path",
+          "description": "Shortest valid input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "a"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "a"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.75
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 All Empty",
+          "category": "negative",
+          "description": "Test with All Empty input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": ""
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": ""
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "error_message_present",
+              "expected": "required"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
             }
           ],
           "confidence": 0.85
         },
         {
-          "name": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx [20260617_092244] Empty Inputs Negative Path",
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 SQL Inject",
           "category": "negative",
-          "steps": [],
+          "description": "Test with SQL Inject input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "' OR '1'='1"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "' OR '1'='1"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_sql_error",
+              "expected": "syntax"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 XSS Script",
+          "category": "negative",
+          "description": "Test with XSS Script input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "<script>alert(1)</script>"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "<script>alert(1)</script>"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Long 300",
+          "category": "negative",
+          "description": "Test with Long 300 input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Long 1000",
+          "category": "negative",
+          "description": "Test with Long 1000 input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Spaces Only",
+          "category": "negative",
+          "description": "Test with Spaces Only input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "   "
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "   "
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
           "assertions": [
             {
               "type": "error_message_present",
-              "expected": "Required field"
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Null Byte",
+          "category": "negative",
+          "description": "Test with Null Byte input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "test\u0000value"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "test\u0000value"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Newlines",
+          "category": "negative",
+          "description": "Test with Newlines input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "line1\nline2\nline3"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "line1\nline2\nline3"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Tabs",
+          "category": "negative",
+          "description": "Test with Tabs input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "val\t\t\t"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "val\t\t\t"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 All Numbers",
+          "category": "negative",
+          "description": "Test with All Numbers input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "1234567890"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "1234567890"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "error_message_present",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 All Specials",
+          "category": "negative",
+          "description": "Test with All Specials input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "!@#$%^&*()"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "!@#$%^&*()"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Very Short 1",
+          "category": "negative",
+          "description": "Test with Very Short 1 input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "a"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "a"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Int Max+1",
+          "category": "negative",
+          "description": "Test with Int Max+1 input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "2147483648"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "2147483648"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Negative Num",
+          "category": "negative",
+          "description": "Test with Negative Num input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "-999999"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "-999999"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Float Value",
+          "category": "negative",
+          "description": "Test with Float Value input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "3.14159"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "3.14159"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 HTML Tags",
+          "category": "negative",
+          "description": "Test with HTML Tags input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "<b>bold</b><i>italic</i>"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "<b>bold</b><i>italic</i>"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Path Traversal",
+          "category": "negative",
+          "description": "Test with Path Traversal input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "../../../etc/passwd"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "../../../etc/passwd"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 URL Encoded",
+          "category": "negative",
+          "description": "Test with URL Encoded input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "%3Cscript%3Ealert%281%29%3C/script%3E"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "%3Cscript%3Ealert%281%29%3C/script%3E"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Unicode Null",
+          "category": "negative",
+          "description": "Test with Unicode Null input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "\u0000\u0001\u0002"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "\u0000\u0001\u0002"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Repeated Char",
+          "category": "negative",
+          "description": "Test with Repeated Char input",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "aaaaaaaaaaaaaaaaaaaaa"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "aaaaaaaaaaaaaaaaaaaaa"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.85
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Japanese Text",
+          "category": "edge_case",
+          "description": "Edge case: Japanese Text",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "\u7530\u4e2d\u592a\u90ce\u30c6\u30b9\u30c8"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "\u7530\u4e2d\u592a\u90ce\u30c6\u30b9\u30c8"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
             }
           ],
           "confidence": 0.8
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "name": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx [20260617_095127]",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx",
-      "created_at": "2026-06-17T09:51:27.470795"
-    },
-    {
-      "id": 3,
-      "name": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx [20260617_095213]",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx",
-      "created_at": "2026-06-17T09:52:13.768561",
-      "test_cases": [
-        {
-          "name": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx [20260617_095213] \u2014 Happy Path",
-          "category": "happy_path",
-          "description": "Reproduce the recorded flow with valid data",
-          "steps": [
-            {
-              "element_id": "html",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "div.card-body",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "select#ddlEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "select#ddlEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#txtEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#btnShowResult",
-              "action": "click",
-              "value": null
-            }
-          ],
-          "assertions": [
-            {
-              "type": "no_error_message",
-              "expected": ""
-            },
-            {
-              "type": "url_not_contains",
-              "expected": "error"
-            }
-          ],
-          "confidence": 0.88
         },
         {
-          "name": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx [20260617_095213] \u2014 All Fields Empty",
-          "category": "negative",
-          "description": "Submit without filling any fields; expect validation errors",
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Arabic RTL",
+          "category": "edge_case",
+          "description": "Edge case: Arabic RTL",
           "steps": [
             {
-              "element_id": "submit",
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "\u0645\u0631\u062d\u0628\u0627 \u0628\u0627\u0644\u0639\u0627\u0644\u0645"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "\u0645\u0631\u062d\u0628\u0627 \u0628\u0627\u0644\u0639\u0627\u0644\u0645"
+            },
+            {
+              "element_id": "input#txtLoginID",
               "action": "click",
               "value": null
             }
           ],
           "assertions": [
-            {
-              "type": "error_message_present",
-              "expected": "required"
-            },
-            {
-              "type": "url_not_contains",
-              "expected": "/success"
-            }
-          ],
-          "confidence": 0.9
-        },
-        {
-          "name": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx [20260617_095213] \u2014 SQL Injection",
-          "category": "security",
-          "description": "Inject SQL into every text field",
-          "steps": [
-            {
-              "element_id": "html",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "div.card-body",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "select#ddlEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "select#ddlEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#txtEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#btnShowResult",
-              "action": "click",
-              "value": null
-            }
-          ],
-          "assertions": [
-            {
-              "type": "url_not_contains",
-              "expected": "/success"
-            },
-            {
-              "type": "no_sql_error",
-              "expected": "syntax error"
-            },
             {
               "type": "no_server_error",
               "expected": "500"
             }
           ],
-          "confidence": 0.92
+          "confidence": 0.8
         },
         {
-          "name": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx [20260617_095213] \u2014 XSS Payload",
-          "category": "security",
-          "description": "Inject script tags into every text field",
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Chinese",
+          "category": "edge_case",
+          "description": "Edge case: Chinese",
           "steps": [
             {
-              "element_id": "html",
-              "action": "click",
-              "value": null
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "\u6d4b\u8bd5\u7528\u6237\u540d\u8f93\u5165"
             },
             {
-              "element_id": "div.card-body",
-              "action": "click",
-              "value": null
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "\u6d4b\u8bd5\u7528\u6237\u540d\u8f93\u5165"
             },
             {
-              "element_id": "select#ddlEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "select#ddlEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#txtEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#btnShowResult",
+              "element_id": "input#txtLoginID",
               "action": "click",
               "value": null
             }
           ],
           "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.8
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Emoji",
+          "category": "edge_case",
+          "description": "Edge case: Emoji",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "\ud83c\udf89\ud83d\ude80\ud83d\udca5User\ud83d\udd25"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "\ud83c\udf89\ud83d\ude80\ud83d\udca5User\ud83d\udd25"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.8
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Mixed Scripts",
+          "category": "edge_case",
+          "description": "Edge case: Mixed Scripts",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "\u00dcn\u00efc\u00f6d\u00e9 T\u00ebst"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "\u00dcn\u00efc\u00f6d\u00e9 T\u00ebst"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.8
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Leading Space",
+          "category": "edge_case",
+          "description": "Edge case: Leading Space",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "  leadingspace"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "  leadingspace"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.8
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Trailing Space",
+          "category": "edge_case",
+          "description": "Edge case: Trailing Space",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "trailingspace  "
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "trailingspace  "
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.8
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 50 Spaces",
+          "category": "edge_case",
+          "description": "Edge case: 50 Spaces",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "                                                  "
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "                                                  "
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.8
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Zero Value",
+          "category": "edge_case",
+          "description": "Edge case: Zero Value",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "0"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "0"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.8
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Negative One",
+          "category": "edge_case",
+          "description": "Edge case: Negative One",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "-1"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "-1"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.8
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Max Int",
+          "category": "edge_case",
+          "description": "Edge case: Max Int",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "2147483647"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "2147483647"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.8
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Float Precision",
+          "category": "edge_case",
+          "description": "Edge case: Float Precision",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "1.123456789012"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "1.123456789012"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.8
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 All Same Char",
+          "category": "edge_case",
+          "description": "Edge case: All Same Char",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.8
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Alternating Chars",
+          "category": "edge_case",
+          "description": "Edge case: Alternating Chars",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "abababababababab"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "abababababababab"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.8
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 URL in Field",
+          "category": "edge_case",
+          "description": "Edge case: URL in Field",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "https://evil.com/hack"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "https://evil.com/hack"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            }
+          ],
+          "confidence": 0.8
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 SQL Classic",
+          "category": "security",
+          "description": "Security test: SQL Classic",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "' OR '1'='1"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "' OR '1'='1"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "no_sql_error",
+              "expected": "syntax"
+            },
             {
               "type": "no_alert_triggered",
               "expected": ""
@@ -264,219 +1231,38 @@
               "expected": "/success"
             }
           ],
-          "confidence": 0.9
-        },
-        {
-          "name": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx [20260617_095213] \u2014 Max Length Boundary",
-          "category": "edge_case",
-          "description": "Fill every field with 300+ character string",
-          "steps": [
-            {
-              "element_id": "html",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "div.card-body",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "select#ddlEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "select#ddlEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#txtEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#btnShowResult",
-              "action": "click",
-              "value": null
-            }
-          ],
-          "assertions": [
-            {
-              "type": "no_server_error",
-              "expected": "500"
-            }
-          ],
-          "confidence": 0.85
-        },
-        {
-          "name": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx [20260617_095213] \u2014 Unicode Characters",
-          "category": "edge_case",
-          "description": "Fill fields with unicode, emoji, and RTL text",
-          "steps": [
-            {
-              "element_id": "html",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "div.card-body",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "select#ddlEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "select#ddlEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#txtEnrollOrSeatNo",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#btnShowResult",
-              "action": "click",
-              "value": null
-            }
-          ],
-          "assertions": [
-            {
-              "type": "no_server_error",
-              "expected": "500"
-            }
-          ],
-          "confidence": 0.83
-        }
-      ]
-    },
-    {
-      "id": 4,
-      "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609]",
-      "url": "https://test2.squad1.tech/login",
-      "created_at": "2026-06-17T12:06:09.016570",
-      "test_cases": [
-        {
-          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609] \u2014 Happy Path",
-          "category": "happy_path",
-          "description": "Reproduce the recorded flow with valid data",
-          "steps": [
-            {
-              "element_id": "input#txtLoginID",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#txtP",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "a#loginBtn",
-              "action": "click",
-              "value": null
-            }
-          ],
-          "assertions": [
-            {
-              "type": "no_error_message",
-              "expected": ""
-            },
-            {
-              "type": "url_not_contains",
-              "expected": "error"
-            }
-          ],
-          "confidence": 0.88
-        },
-        {
-          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609] \u2014 All Fields Empty",
-          "category": "negative",
-          "description": "Submit without filling any fields; expect validation errors",
-          "steps": [
-            {
-              "element_id": "submit",
-              "action": "click",
-              "value": null
-            }
-          ],
-          "assertions": [
-            {
-              "type": "error_message_present",
-              "expected": "required"
-            },
-            {
-              "type": "url_not_contains",
-              "expected": "/success"
-            }
-          ],
-          "confidence": 0.9
-        },
-        {
-          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609] \u2014 SQL Injection",
-          "category": "security",
-          "description": "Inject SQL into every text field",
-          "steps": [
-            {
-              "element_id": "input#txtLoginID",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "input#txtP",
-              "action": "click",
-              "value": null
-            },
-            {
-              "element_id": "a#loginBtn",
-              "action": "click",
-              "value": null
-            }
-          ],
-          "assertions": [
-            {
-              "type": "url_not_contains",
-              "expected": "/success"
-            },
-            {
-              "type": "no_sql_error",
-              "expected": "syntax error"
-            },
-            {
-              "type": "no_server_error",
-              "expected": "500"
-            }
-          ],
           "confidence": 0.92
         },
         {
-          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609] \u2014 XSS Payload",
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 SQL Drop Table",
           "category": "security",
-          "description": "Inject script tags into every text field",
+          "description": "Security test: SQL Drop Table",
           "steps": [
             {
               "element_id": "input#txtLoginID",
-              "action": "click",
-              "value": null
+              "action": "fill",
+              "value": "'; DROP TABLE users; --"
             },
             {
               "element_id": "input#txtP",
-              "action": "click",
-              "value": null
+              "action": "fill",
+              "value": "'; DROP TABLE users; --"
             },
             {
-              "element_id": "a#loginBtn",
+              "element_id": "input#txtLoginID",
               "action": "click",
               "value": null
             }
           ],
           "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "no_sql_error",
+              "expected": "syntax"
+            },
             {
               "type": "no_alert_triggered",
               "expected": ""
@@ -486,25 +1272,25 @@
               "expected": "/success"
             }
           ],
-          "confidence": 0.9
+          "confidence": 0.92
         },
         {
-          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609] \u2014 Max Length Boundary",
-          "category": "edge_case",
-          "description": "Fill every field with 300+ character string",
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 SQL Union",
+          "category": "security",
+          "description": "Security test: SQL Union",
           "steps": [
             {
               "element_id": "input#txtLoginID",
-              "action": "click",
-              "value": null
+              "action": "fill",
+              "value": "' UNION SELECT 1,username,password FROM users--"
             },
             {
               "element_id": "input#txtP",
-              "action": "click",
-              "value": null
+              "action": "fill",
+              "value": "' UNION SELECT 1,username,password FROM users--"
             },
             {
-              "element_id": "a#loginBtn",
+              "element_id": "input#txtLoginID",
               "action": "click",
               "value": null
             }
@@ -513,27 +1299,39 @@
             {
               "type": "no_server_error",
               "expected": "500"
+            },
+            {
+              "type": "no_sql_error",
+              "expected": "syntax"
+            },
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
             }
           ],
-          "confidence": 0.85
+          "confidence": 0.92
         },
         {
-          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_120609] \u2014 Unicode Characters",
-          "category": "edge_case",
-          "description": "Fill fields with unicode, emoji, and RTL text",
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 SQL Blind Time",
+          "category": "security",
+          "description": "Security test: SQL Blind Time",
           "steps": [
             {
               "element_id": "input#txtLoginID",
-              "action": "click",
-              "value": null
+              "action": "fill",
+              "value": "'; WAITFOR DELAY '0:0:5'--"
             },
             {
               "element_id": "input#txtP",
-              "action": "click",
-              "value": null
+              "action": "fill",
+              "value": "'; WAITFOR DELAY '0:0:5'--"
             },
             {
-              "element_id": "a#loginBtn",
+              "element_id": "input#txtLoginID",
               "action": "click",
               "value": null
             }
@@ -542,9 +1340,349 @@
             {
               "type": "no_server_error",
               "expected": "500"
+            },
+            {
+              "type": "no_sql_error",
+              "expected": "syntax"
+            },
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
             }
           ],
-          "confidence": 0.83
+          "confidence": 0.92
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 XSS Script Tag",
+          "category": "security",
+          "description": "Security test: XSS Script Tag",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "<script>alert('XSS')</script>"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "<script>alert('XSS')</script>"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "no_sql_error",
+              "expected": "syntax"
+            },
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.92
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 XSS Img onerror",
+          "category": "security",
+          "description": "Security test: XSS Img onerror",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "<img src=x onerror=alert(1)>"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "<img src=x onerror=alert(1)>"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "no_sql_error",
+              "expected": "syntax"
+            },
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.92
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 XSS SVG",
+          "category": "security",
+          "description": "Security test: XSS SVG",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "<svg onload=alert(1)>"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "<svg onload=alert(1)>"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "no_sql_error",
+              "expected": "syntax"
+            },
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.92
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 XSS Event",
+          "category": "security",
+          "description": "Security test: XSS Event",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "\" onmouseover=\"alert(1)"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "\" onmouseover=\"alert(1)"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "no_sql_error",
+              "expected": "syntax"
+            },
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.92
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Cmd Injection",
+          "category": "security",
+          "description": "Security test: Cmd Injection",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "; ls -la | cat /etc/passwd"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "; ls -la | cat /etc/passwd"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "no_sql_error",
+              "expected": "syntax"
+            },
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.92
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Path Traversal",
+          "category": "security",
+          "description": "Security test: Path Traversal",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "../../../etc/passwd"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "../../../etc/passwd"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "no_sql_error",
+              "expected": "syntax"
+            },
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.92
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 LDAP Injection",
+          "category": "security",
+          "description": "Security test: LDAP Injection",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "*)(uid=*))(|(uid=*"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "*)(uid=*))(|(uid=*"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "no_sql_error",
+              "expected": "syntax"
+            },
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.92
+        },
+        {
+          "name": "Squad1 - A Product by Talakunchi Networks Pvt. Ltd. [20260617_173322] \u2014 Template Inject",
+          "category": "security",
+          "description": "Security test: Template Inject",
+          "steps": [
+            {
+              "element_id": "input#txtLoginID",
+              "action": "fill",
+              "value": "{{7*7}}${7*7}#{7*7}"
+            },
+            {
+              "element_id": "input#txtP",
+              "action": "fill",
+              "value": "{{7*7}}${7*7}#{7*7}"
+            },
+            {
+              "element_id": "input#txtLoginID",
+              "action": "click",
+              "value": null
+            }
+          ],
+          "assertions": [
+            {
+              "type": "no_server_error",
+              "expected": "500"
+            },
+            {
+              "type": "no_sql_error",
+              "expected": "syntax"
+            },
+            {
+              "type": "no_alert_triggered",
+              "expected": ""
+            },
+            {
+              "type": "url_not_contains",
+              "expected": "/success"
+            }
+          ],
+          "confidence": 0.92
         }
       ]
     }
@@ -556,274 +1694,14 @@
       "element_id": null,
       "step_order": 1,
       "action": "navigate",
-      "value": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx",
-      "selector": null,
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 2,
-      "workflow_id": 1,
-      "element_id": 22,
-      "step_order": 2,
-      "action": "click",
-      "value": null,
-      "selector": "select#ddlEnrollOrSeatNo",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 3,
-      "workflow_id": 1,
-      "element_id": 23,
-      "step_order": 3,
-      "action": "type",
-      "value": "2",
-      "selector": "select#ddlEnrollOrSeatNo",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 4,
-      "workflow_id": 1,
-      "element_id": 24,
-      "step_order": 4,
-      "action": "click",
-      "value": null,
-      "selector": "select#ddlEnrollOrSeatNo",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 5,
-      "workflow_id": 1,
-      "element_id": 25,
-      "step_order": 5,
-      "action": "click",
-      "value": null,
-      "selector": "input#txtEnrollOrSeatNo",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 6,
-      "workflow_id": 1,
-      "element_id": 26,
-      "step_order": 6,
-      "action": "type",
-      "value": "24111000014",
-      "selector": "input#txtEnrollOrSeatNo",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 7,
-      "workflow_id": 1,
-      "element_id": 27,
-      "step_order": 7,
-      "action": "click",
-      "value": null,
-      "selector": "input#txtCaptchaHot",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 8,
-      "workflow_id": 1,
-      "element_id": 28,
-      "step_order": 8,
-      "action": "type",
-      "value": "Qrr7CRsG",
-      "selector": "input#txtCaptchaHot",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 9,
-      "workflow_id": 1,
-      "element_id": 29,
-      "step_order": 9,
-      "action": "click",
-      "value": null,
-      "selector": "input#btnShowResult",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 10,
-      "workflow_id": 1,
-      "element_id": null,
-      "step_order": 10,
-      "action": "navigate",
-      "value": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx",
-      "selector": null,
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 11,
-      "workflow_id": 2,
-      "element_id": null,
-      "step_order": 1,
-      "action": "navigate",
-      "value": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx",
-      "selector": null,
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 12,
-      "workflow_id": 2,
-      "element_id": 30,
-      "step_order": 2,
-      "action": "click",
-      "value": null,
-      "selector": "select#ddlEnrollOrSeatNo",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 13,
-      "workflow_id": 2,
-      "element_id": 31,
-      "step_order": 3,
-      "action": "click",
-      "value": null,
-      "selector": "select#ddlEnrollOrSeatNo",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 14,
-      "workflow_id": 2,
-      "element_id": 32,
-      "step_order": 4,
-      "action": "click",
-      "value": null,
-      "selector": "input#txtEnrollOrSeatNo",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 15,
-      "workflow_id": 2,
-      "element_id": 33,
-      "step_order": 5,
-      "action": "click",
-      "value": null,
-      "selector": "input#btnShowResult",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 16,
-      "workflow_id": 2,
-      "element_id": null,
-      "step_order": 6,
-      "action": "navigate",
-      "value": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx",
-      "selector": null,
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 17,
-      "workflow_id": 3,
-      "element_id": null,
-      "step_order": 1,
-      "action": "navigate",
-      "value": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx",
-      "selector": null,
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 18,
-      "workflow_id": 3,
-      "element_id": 34,
-      "step_order": 2,
-      "action": "click",
-      "value": null,
-      "selector": "html",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 19,
-      "workflow_id": 3,
-      "element_id": 35,
-      "step_order": 3,
-      "action": "click",
-      "value": null,
-      "selector": "div.card-body",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 20,
-      "workflow_id": 3,
-      "element_id": 36,
-      "step_order": 4,
-      "action": "click",
-      "value": null,
-      "selector": "select#ddlEnrollOrSeatNo",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 21,
-      "workflow_id": 3,
-      "element_id": 37,
-      "step_order": 5,
-      "action": "type",
-      "value": "2",
-      "selector": "select#ddlEnrollOrSeatNo",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 22,
-      "workflow_id": 3,
-      "element_id": 38,
-      "step_order": 6,
-      "action": "click",
-      "value": null,
-      "selector": "select#ddlEnrollOrSeatNo",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 23,
-      "workflow_id": 3,
-      "element_id": 39,
-      "step_order": 7,
-      "action": "click",
-      "value": null,
-      "selector": "input#txtEnrollOrSeatNo",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 24,
-      "workflow_id": 3,
-      "element_id": 40,
-      "step_order": 8,
-      "action": "type",
-      "value": "24111000014",
-      "selector": "input#txtEnrollOrSeatNo",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 25,
-      "workflow_id": 3,
-      "element_id": 41,
-      "step_order": 9,
-      "action": "click",
-      "value": null,
-      "selector": "input#btnShowResult",
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 26,
-      "workflow_id": 3,
-      "element_id": null,
-      "step_order": 10,
-      "action": "navigate",
-      "value": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx",
-      "selector": null,
-      "url": "https://result.msbte.ac.in/pcwebBTRes/pcResult01/pcfrmViewMSBTEResult.aspx"
-    },
-    {
-      "id": 27,
-      "workflow_id": 4,
-      "element_id": null,
-      "step_order": 1,
-      "action": "navigate",
       "value": "https://test2.squad1.tech/login",
       "selector": null,
       "url": "https://test2.squad1.tech/login"
     },
     {
-      "id": 28,
-      "workflow_id": 4,
-      "element_id": 42,
+      "id": 2,
+      "workflow_id": 1,
+      "element_id": 47,
       "step_order": 2,
       "action": "click",
       "value": null,
@@ -831,9 +1709,9 @@
       "url": "https://test2.squad1.tech/login"
     },
     {
-      "id": 29,
-      "workflow_id": 4,
-      "element_id": 43,
+      "id": 3,
+      "workflow_id": 1,
+      "element_id": 48,
       "step_order": 3,
       "action": "type",
       "value": "admin@talakunchi.com",
@@ -841,9 +1719,9 @@
       "url": "https://test2.squad1.tech/login"
     },
     {
-      "id": 30,
-      "workflow_id": 4,
-      "element_id": 44,
+      "id": 4,
+      "workflow_id": 1,
+      "element_id": 49,
       "step_order": 4,
       "action": "click",
       "value": null,
@@ -851,9 +1729,9 @@
       "url": "https://test2.squad1.tech/login"
     },
     {
-      "id": 31,
-      "workflow_id": 4,
-      "element_id": 45,
+      "id": 5,
+      "workflow_id": 1,
+      "element_id": 50,
       "step_order": 5,
       "action": "type",
       "value": "Admin@12345",
@@ -861,14 +1739,24 @@
       "url": "https://test2.squad1.tech/login"
     },
     {
-      "id": 32,
-      "workflow_id": 4,
-      "element_id": 46,
+      "id": 6,
+      "workflow_id": 1,
+      "element_id": 51,
       "step_order": 6,
       "action": "click",
       "value": null,
       "selector": "a#loginBtn",
       "url": "https://test2.squad1.tech/login"
+    },
+    {
+      "id": 7,
+      "workflow_id": 1,
+      "element_id": null,
+      "step_order": 7,
+      "action": "navigate",
+      "value": "https://test2.squad1.tech/welcomehome",
+      "selector": null,
+      "url": "https://test2.squad1.tech/welcomehome"
     }
   ],
   "pages": [
@@ -880,6 +1768,11 @@
     {
       "id": 2,
       "url": "https://test2.squad1.tech/login",
+      "title": ""
+    },
+    {
+      "id": 3,
+      "url": "https://test2.squad1.tech/welcomehome",
       "title": ""
     }
   ],
@@ -1246,6 +2139,46 @@
     },
     {
       "id": 46,
+      "page_id": 2,
+      "element_type": "a",
+      "text": "LOG IN",
+      "selector": "a#loginBtn",
+      "attributes": "{\"href\": \"javascript:void(0)\", \"id\": \"loginBtn\"}"
+    },
+    {
+      "id": 47,
+      "page_id": 2,
+      "element_type": "input",
+      "text": "",
+      "selector": "input#txtLoginID",
+      "attributes": "{\"type\": \"text\", \"class\": \"form-control login-input\", \"id\": \"txtLoginID\"}"
+    },
+    {
+      "id": 48,
+      "page_id": 2,
+      "element_type": "input",
+      "text": "",
+      "selector": "input#txtLoginID",
+      "attributes": "{\"type\": \"text\", \"class\": \"form-control login-input\", \"placeholder\": \"Email ID\", \"id\": \"txtLoginID\"}"
+    },
+    {
+      "id": 49,
+      "page_id": 2,
+      "element_type": "input",
+      "text": "",
+      "selector": "input#txtP",
+      "attributes": "{\"type\": \"password\", \"class\": \"form-control login-input\", \"id\": \"txtP\"}"
+    },
+    {
+      "id": 50,
+      "page_id": 2,
+      "element_type": "input",
+      "text": "",
+      "selector": "input#txtP",
+      "attributes": "{\"type\": \"password\", \"class\": \"form-control login-input\", \"placeholder\": \"Password\", \"id\": \"txtP\"}"
+    },
+    {
+      "id": 51,
       "page_id": 2,
       "element_type": "a",
       "text": "LOG IN",
